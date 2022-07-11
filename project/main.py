@@ -26,8 +26,6 @@ def dataset():
     url1 = images['image_1']['image_url']
     url2 = images['image_2']['image_url']
     
-    print("images values ")
-    print(images)
 
     id1 = images['image_1']['image_id']
     id2 = images['image_2']['image_id']
@@ -35,6 +33,7 @@ def dataset():
     return render_template('dataset4.html', id=current_user.id, image_1_url = url1, image_2_url = url2, image_1_id = id1, image_2_id = id2)
 
 def read_random_images():
+    print("Random images generated")
     images = ImageInfo.query.all()
     results = [
         {
@@ -58,10 +57,34 @@ def dataset_post():
     image_1_score = request.form.get('slider1WithValue')
     image_2_score = request.form.get('slider2WithValue')
 
-
     user_id = current_user.id
     image_1_id = request.form.get('image_1_id')
     image_2_id = request.form.get('image_2_id')
+
+    if image_1_score == '0' or image_2_score == '0':
+        flash('No zeroes please')   
+        print("Here")
+        image_1 = ImageInfo.query.filter_by(image_id=image_1_id).first()
+        image_1_url = image_1.image_url
+
+        image_2 = ImageInfo.query.filter_by(image_id=image_2_id).first()
+        image_2_url = image_2.image_url
+
+        print("Image1 ")
+        print(image_1)
+
+        print("Image2")
+        print(image_2)
+
+
+        print("Image1 url ")
+        print(image_1_url)
+
+        print("Image2 url")
+        print(image_2_url)
+
+        render_template('dataset4.html', id=current_user.id, image_1_url = image_1_url, image_2_url = image_2_url, image_1_id = image_1_id, image_2_id = image_2_id)
+        # return
 
     response_info = ResponseInfo.query.filter_by(image_1_id=image_1_id, image_2_id= image_2_id,
                                                 labeller_id = user_id).first()
