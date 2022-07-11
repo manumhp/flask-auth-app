@@ -1,7 +1,9 @@
-from flask import Blueprint, render_template,redirect, url_for, request
+from flask import Blueprint, render_template,redirect, url_for, request, flash
 from flask_login import login_required, current_user
-# from requests import request
+from nbformat import read
 from . import db
+from .models import ImageInfo, Labeller, ResponseInfo
+import random
 
 main = Blueprint('main', __name__)
 
@@ -18,8 +20,37 @@ def profile():
 @login_required
 def dataset():
     ## code from display random images
-    return render_template('dataset.html', id=current_user.id)
+    ## get the urls for two random images from the database and display them
 
+    images = read_random_images()
+    url1 = images['image_1']['image_url']
+    url2 = images['image_2']['image_url']
+    
+    print("images values ")
+    print(images)
+
+    id1 = images['image_1']['image_id']
+    id2 = images['image_2']['image_id']
+
+    return render_template('dataset4.html', id=current_user.id, image_1_url = url1, image_2_url = url2, image_1_id = id1, image_2_id = id2)
+
+def read_random_images():
+    images = ImageInfo.query.all()
+    results = [
+        {
+            "image_id": image.image_id,
+            "image_url": image.image_url,
+            "labelled": image.labelled
+        } for image in images
+    ]
+    counts = int(len(results)/3)
+    random_indices = random.sample(range(0, counts), 2)
+    
+    result_first = results[random_indices[0]]
+    result_second = results[random_indices[1]]
+
+    result = {"image_1": result_first, "image_2": result_second}
+    return result
 
 @main.route('/dataset', methods=['POST'])
 @login_required
@@ -29,35 +60,19 @@ def dataset_post():
 
 
     user_id = current_user.id
-    image_1_url = request.form.get('image_1_id')
-    image_2_url = request.form.get('image_2_id')
+    image_1_id = request.form.get('image_1_id')
+    image_2_id = request.form.get('image_2_id')
 
-    print("Image 1: ", float(image_1_score))
-    print("Image 2: ", float(image_2_score))
-
-    # print("Image 1: ", image_11_score)
-    # print("Image 2: ", image_22_score)
+    response_info = ResponseInfo.query.filter_by(image_1_id=image_1_id, image_2_id= image_2_id,
+                                                labeller_id = user_id).first()
     
+    if response_info:
+        flash('Dataset entry already exists in the database')        
+        return redirect(url_for('main.dataset'))
 
-    ## get image_1_id and image_2_id from the image model
-    # image_1_id = 
-    # image_2_id = 
+    new_response = ResponseInfo(labeller_id = user_id, image_1_id=image_1_id, image_2_id=image_2_id, image_1_score=image_1_score, image_2_score=image_2_score)
 
+    db.session.add(new_response)
+    db.session.commit()
 
-    # dataset_entry = DataSetEntry.query.filter_by(image_1_id=image_1_id, image_2_id = image_2_id, 
-    #                                             image_1_score=image_1_score, image_2_score=image_2_score, user_id=user_id).first()
-
-    
-    # new_entry = DataSetEntry(user_id=user_id,image_1_id=image_1_id, image_2_id=image_2_id,  
-    #                         image_1_score=image_1_score, image_2_score=image_2_score)                                                
-
-    # check if the entry exists
-    
-    # if not dataset_entry:
-        ## add it to the database....... REVIEW THE CODE FOR ADDING ENTRY TO A DIFFERENT TABLE
-        # db.session.add(new_user)
-        # db.session.commit()
-        # pass
-    
-    # login_user(user, remember=remember)
-    return redirect(url_for('main.dataset'))    
+    return redirect(url_for('main.dataset'))
