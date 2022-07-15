@@ -16,19 +16,31 @@ def index():
 def profile():
     return render_template('profile.html', name=current_user.name)
 
-@main.route('/dataset')
+@main.route('/dataset', methods=['GET'])
 @login_required
 def dataset():
     ## code from display random images
     ## get the urls for two random images from the database and display them
+    image_1_url = request.args.get('image_1_url')
+    image_2_url = request.args.get('image_2_url')
+    image_1_id = request.args.get('image_1_id')
+    image_2_id = request.args.get('image_2_id')
 
-    images = read_random_images()
-    url1 = images['image_1']['image_url']
-    url2 = images['image_2']['image_url']
+
+    if not image_1_url:
+        images = read_random_images()
+        url1 = images['image_1']['image_url']
+        url2 = images['image_2']['image_url']        
+        id1 = images['image_1']['image_id']
+        id2 = images['image_2']['image_id']
     
+    else:
+        url1 = image_1_url
+        url2 = image_2_url
+        id1 = image_1_id
+        id2 = image_2_id
 
-    id1 = images['image_1']['image_id']
-    id2 = images['image_2']['image_id']
+
 
     return render_template('dataset4.html', id=current_user.id, image_1_url = url1, image_2_url = url2, image_1_id = id1, image_2_id = id2)
 
@@ -51,6 +63,11 @@ def read_random_images():
     result = {"image_1": result_first, "image_2": result_second}
     return result
 
+# @main.route('/dataset_entry_reshow', methods=['GET'])
+# @login_required
+# def dataset_entry_reshow(url1, url2, id1, id2):
+#     return render_template('dataset4.html', id=current_user.id, image_1_url = url1, image_2_url = url2, image_1_id = id1, image_2_id = id2)
+
 @main.route('/dataset', methods=['POST'])
 @login_required
 def dataset_post():
@@ -60,7 +77,7 @@ def dataset_post():
     user_id = current_user.id
     image_1_id = request.form.get('image_1_id')
     image_2_id = request.form.get('image_2_id')
-
+    images = {}
     if image_1_score == '0' or image_2_score == '0':
         flash('No zeroes please')   
         print("Here")
@@ -82,20 +99,37 @@ def dataset_post():
 
         print("Image2 url")
         print(image_2_url)
+        images = {
+            "image_1": {
+                "image_url": image_1_url,
+                "image_id": image_1_id,
+            },
+            "image_2": {
+                "image_url": image_2_url,
+                "image_id": image_2_id,
+            }
 
-        render_template('dataset4.html', id=current_user.id, image_1_url = image_1_url, image_2_url = image_2_url, image_1_id = image_1_id, image_2_id = image_2_id)
+        }
+        # print(images['image_1']['image_url'])
+        # print(images['image_2']['image_url'])
+        # print(images['image_1']['image_id'])
+        # print(images['image_2']['image_id'])
+
+        # render_template('dataset4.html', id=current_user.id, image_1_url = image_1_url, image_2_url = image_2_url, image_1_id = image_1_id, image_2_id = image_2_id)
         # return
+        # return redirect(url_for('main.dataset', images=images))
+        return redirect(url_for('main.dataset', image_1_url=image_1_url, image_2_url=image_2_url, image_1_id=image_1_id, image_2_id= image_2_id))
+    else:
+        response_info = ResponseInfo.query.filter_by(image_1_id=image_1_id, image_2_id= image_2_id,
+                                                    labeller_id = user_id).first()
+        
+        if response_info:
+            flash('Dataset entry already exists in the database')        
+            return redirect(url_for('main.dataset'))
 
-    response_info = ResponseInfo.query.filter_by(image_1_id=image_1_id, image_2_id= image_2_id,
-                                                labeller_id = user_id).first()
-    
-    if response_info:
-        flash('Dataset entry already exists in the database')        
+        new_response = ResponseInfo(labeller_id = user_id, image_1_id=image_1_id, image_2_id=image_2_id, image_1_score=image_1_score, image_2_score=image_2_score)
+
+        db.session.add(new_response)
+        db.session.commit()
+
         return redirect(url_for('main.dataset'))
-
-    new_response = ResponseInfo(labeller_id = user_id, image_1_id=image_1_id, image_2_id=image_2_id, image_1_score=image_1_score, image_2_score=image_2_score)
-
-    db.session.add(new_response)
-    db.session.commit()
-
-    return redirect(url_for('main.dataset'))
