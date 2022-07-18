@@ -9,8 +9,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css" />
 </head>
 
+<style>
+
+</style>
+
 <body>
-    <section class="hero is-primary is-fullheight ">
+    <section class="hero ">
 
         <div class="hero-head">
             <nav class="navbar">
@@ -47,13 +51,17 @@
             </nav>
         </div>
 
-        <div class="hero-body">
-            <div class="container has-text-centered">
+        <!-- <div class="section is-paddingless horizontal"> -->
+        <div class="section horizontal">    
+            <div class="container grid is-large"> 
                {% block content %}
                {% endblock %}
             </div>
         </div>
+
+
     </section>
 </body>
+
 
 </html>

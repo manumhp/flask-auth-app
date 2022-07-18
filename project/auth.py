@@ -1,7 +1,8 @@
+from cProfile import label
 from click import password_option
 from flask import Blueprint, flash, render_template, redirect, url_for, request
 from werkzeug.security import generate_password_hash, check_password_hash
-from .models import User
+from .models import Labeller
 from flask_login import login_user, login_required, logout_user
 
 from . import db
@@ -19,15 +20,15 @@ def login_post():
     password = request.form.get('password')
     remember = True if request.form.get('remember') else False
 
-    user = User.query.filter_by(email=email).first()
+    labeller = Labeller.query.filter_by(email=email).first()
 
     # check if the user exists
     # take the user supplied password, hash it and compare it against the hashed password stored in the database
-    if not user or not check_password_hash(user.password, password):
+    if not labeller or not check_password_hash(labeller.password, password):
         flash('Please check your login details and try again')
         return redirect(url_for('auth.login'))
     
-    login_user(user, remember=remember)
+    login_user(labeller, remember=remember)
     return redirect(url_for('main.profile'))
 
 @auth.route('/signup')
@@ -41,15 +42,15 @@ def signup_post():
     name = request.form.get('name')
     password = request.form.get('password')
 
-    user = User.query.filter_by(email=email).first()  ## if this returns a user,  the user already exists in the database
+    labeller = Labeller.query.filter_by(email=email).first()  ## if this returns a user,  the user already exists in the database
 
-    if user:
-        flash('User already exists in the database')
+    if labeller:
+        flash('Labeller already exists in the database')
         return redirect(url_for('auth.signup'))
 
-    new_user = User(email=email, name=name, password=generate_password_hash(password, method='sha256'))
+    new_labeller = Labeller(email=email, name=name, password=generate_password_hash(password, method='sha256'))
 
-    db.session.add(new_user)
+    db.session.add(new_labeller)
     db.session.commit()
 
     return redirect(url_for('auth.login'))
