@@ -1,1 +1,1 @@
-web: gunicorn main:app --lof-file -
+web: gunicorn main:app --log-file -
