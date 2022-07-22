@@ -10,9 +10,8 @@ from .import db
 class Labeller(UserMixin, db.Model):
     __tablename__ = 'labeller_info'
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(100), unique=True)
+    username = db.Column(db.String(255), unique=True)
     password = db.Column(db.String(100))
-    name = db.Column(db.String(100))
 
 class ImageInfo(db.Model):
     image_id = db.Column(db.String(200), primary_key=True)
@@ -25,8 +24,6 @@ class ResponseInfo(UserMixin, db.Model):
     labeller_id = db.Column(db.Integer, ForeignKey("labeller_info.id"))
     image_1_id = db.Column(db.Integer, ForeignKey("image_info.image_id"))
     image_2_id = db.Column(db.Integer, ForeignKey("image_info.image_id"))
-    # image_1_score = db.Column(db.Float, nullable=False)
-    # image_2_score = db.Column(db.Float, nullable=False)
     
     image_1_score = db.Column(db.Float)
     image_2_score = db.Column(db.Float)    

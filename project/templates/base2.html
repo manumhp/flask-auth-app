@@ -14,7 +14,7 @@
 </style>
 
 <body>
-    <section class="hero ">
+    <section class="hero  ">
 
         <div class="hero-head">
             <nav class="navbar">
@@ -25,9 +25,9 @@
                                 Home
                             </a>
                             {% if current_user.is_authenticated %}
-                            <a href="{{ url_for('main.profile') }}" class="navbar-item">
-                                Profile
-                            </a>
+                            <!-- <a href="{{ url_for('main.survey_instructions') }}" class="navbar-item">
+                                Survey Instructions
+                            </a> -->
                             {% endif %}
                             {% if not current_user.is_authenticated %}
                             <a href="{{ url_for('auth.login') }}" class="navbar-item">
@@ -52,7 +52,7 @@
         </div>
 
         <!-- <div class="section is-paddingless horizontal"> -->
-        <div class="section horizontal">    
+        <div class="section horizontal is-medium">    
             <div class="container grid is-large"> 
                {% block content %}
                {% endblock %}
