@@ -5,8 +5,10 @@ from click import password_option
 from matplotlib import image
 # from pandas import nullable
 from sqlalchemy import Float, ForeignKey
-from .import db
-
+from flask_sqlalchemy import SQLAlchemy
+# import db
+# import db.sqlite as db
+db = SQLAlchemy()
 class Labeller(UserMixin, db.Model):
     __tablename__ = 'labeller_info'
     id = db.Column(db.Integer, primary_key=True)

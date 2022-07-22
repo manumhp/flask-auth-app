@@ -3,10 +3,16 @@ from platformdirs import user_cache_dir, user_config_dir
 from flask import Blueprint, render_template,redirect, url_for, request, flash
 from flask_login import login_required, current_user
 # from nbformat import read
-from . import db
-from .models import ImageInfo, Labeller, ResponseInfo
+# from . import db
+from models import ImageInfo, Labeller, ResponseInfo
 import random
 from pandas import DataFrame
+
+from flask_sqlalchemy import SQLAlchemy
+
+# from . import db
+db = SQLAlchemy()
+
 
 main = Blueprint('main', __name__)
 

@@ -3,10 +3,12 @@ from hashlib import new
 from click import password_option
 from flask import Blueprint, flash, render_template, redirect, url_for, request
 from werkzeug.security import generate_password_hash, check_password_hash
-from .models import Labeller
+from models import Labeller
 from flask_login import login_user, login_required, logout_user
+from flask_sqlalchemy import SQLAlchemy
 
-from . import db
+# from . import db
+db = SQLAlchemy()
 
 auth = Blueprint('auth', __name__)
 
