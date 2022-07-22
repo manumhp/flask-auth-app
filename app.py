@@ -27,7 +27,7 @@ app = Flask(__name__)
 if __name__ == '__main__':
     
     app.config['SECRET_KEY'] = 'secret-key-goes-here'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://oewvcycclwahny:65a2e3da4a52c1c2b26565ec9f41c9a94c5b7264a8f0c9c34c2f456c068e85ca@ec2-3-248-121-12.eu-west-1.compute.amazonaws.com:5432/daf2075s071c3c'
     # app.config['SERVER_NAME'] = '127.0.0.1:5001'
     db.init_app(app)
 
